@@ -49,11 +49,29 @@
   const backBtn = document.getElementById("demoBackBtn");
   const graceBtn = document.getElementById("demoGraceBtn");
   const hint = document.getElementById("demoHint");
+  const stagePills = Array.from(document.querySelectorAll(".stage-pill"));
+  const stageCaption = document.getElementById("demoStageCaption");
 
-  // Timing, compressed from the real app's ~20s drift window.
+  // Timing, compressed from the real app's ~20s (or, ramped, ~40s) drift window.
   const WATCH_MS = 2400;
   const DRIFT_MS = 2800;
   const SETTLE_MS = 2200;
+  const SILENT_HOLD_MS = 3200; // how long we sit on "nothing happened" for session 1
+
+  // Mirrors the real app's trust ramp (main.js: QUIET_SESSIONS=3,
+  // RAMP_SESSIONS=7) — three presets a visitor can compare directly.
+  const STAGES = {
+    new: {
+      caption: "New installs get 3 fully silent sessions before the buddy ever speaks up — try one, then compare it to session 15+.",
+    },
+    ramped: {
+      caption: "Sessions 4–10 still get 2x as long (about 40s for real) before escalating — still finding its footing.",
+    },
+    full: {
+      caption: "From session 11 on, this is it for good: the normal ~20s fuse, every time.",
+    },
+  };
+  let selectedStage = "new";
 
   let runToken = 0; // bumped on every (re)start so stale timers no-op
 
@@ -73,9 +91,10 @@
     });
   }
 
-  async function run(goal, token) {
+  async function run(goal, token, stage) {
     try {
-      // Watching, quietly.
+      // Watching, quietly — identical for all three stages. The
+      // difference only shows up once you actually drift.
       setStage("watching");
       url.textContent = "your-screen";
       status.textContent = `Watching your screen for: "${goal}"`;
@@ -83,12 +102,28 @@
       hint.textContent = "Watching, quietly — stays small in the corner while you're on track.";
       await wait(WATCH_MS, token);
 
-      // Drift onto a distraction — soft edge warning first, no words yet
-      // (same rule as the real app: nothing is said during the countdown).
-      setStage("drifting");
+      // Drift onto a distraction.
       url.textContent = "youtube.com/watch?v=…";
       status.textContent = "";
-      hint.textContent = "Drifted off goal — the edges darken as a quiet early warning. Still silent.";
+
+      if (stage === "new") {
+        // The trust ramp's whole point: a brand-new session says and
+        // shows NOTHING here, even though it saw the exact same drift.
+        setStage("watching");
+        hint.textContent = 'Drifted onto YouTube — and session #1 says nothing at all. No warning, no card. Just watching.';
+        await wait(SILENT_HOLD_MS, token);
+        await settle('(Silence was the whole point.)', token, { silent: true });
+        return;
+      }
+
+      // Ramped and full-intensity both show the same real visuals — the
+      // ramp's only difference is HOW LONG this stage lasts for real
+      // (about 40s vs. 20s), which we can't show directly at demo speed,
+      // so the hint says it instead.
+      setStage("drifting");
+      hint.textContent = stage === "ramped"
+        ? "Drifted off goal — still silent, but for real this stage lasts twice as long (about 40s) while it's still earning trust."
+        : "Drifted off goal — the edges darken as a quiet early warning. Still silent.";
       await wait(DRIFT_MS, token);
 
       // Still drifted — the full intervention.
@@ -101,11 +136,19 @@
     }
   }
 
-  async function settle(message, token) {
-    setStage("praise");
+  async function settle(message, token, opts) {
+    const options = opts || {};
+    setStage(options.silent ? "watching" : "praise");
     url.textContent = "your-screen";
     showBubble(message);
-    hint.textContent = "Back to idle — click \"Restart demo\" to run it again.";
+    if (options.silent) {
+      hint.textContent = 'That\'s the trust ramp — click "Restart demo" and try session 15+ to see the difference.';
+    } else {
+      hint.textContent = "Back to idle — click \"Restart demo\" to run it again.";
+    }
+    startBtn.disabled = false;
+    goalInput.disabled = false;
+    stagePills.forEach((p) => (p.disabled = false));
     try {
       await wait(SETTLE_MS, token);
       setStage("idle");
@@ -115,6 +158,15 @@
     }
   }
 
+  function selectStage(stage) {
+    selectedStage = stage;
+    stagePills.forEach((p) => p.classList.toggle("is-active", p.dataset.stage === stage));
+    stageCaption.textContent = STAGES[stage].caption;
+  }
+  stagePills.forEach((pill) => {
+    pill.addEventListener("click", () => selectStage(pill.dataset.stage));
+  });
+
   startBtn.addEventListener("click", () => {
     const goal = goalInput.value.trim() || "finishing my essay";
     runToken += 1;
@@ -122,7 +174,8 @@
     startBtn.disabled = true;
     goalInput.disabled = true;
     restartBtn.disabled = false;
-    run(goal, token);
+    stagePills.forEach((p) => (p.disabled = true));
+    run(goal, token, selectedStage);
   });
 
   restartBtn.addEventListener("click", () => {
@@ -133,6 +186,7 @@
     url.textContent = "your-screen";
     startBtn.disabled = false;
     goalInput.disabled = false;
+    stagePills.forEach((p) => (p.disabled = false));
     hint.textContent = 'Type a goal (or leave the default) and click "Start focus session" to begin.';
   });
 

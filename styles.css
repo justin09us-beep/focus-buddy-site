@@ -307,6 +307,48 @@ section { padding: 64px 0; }
   box-shadow: var(--shadow);
   padding: 28px;
 }
+.demo-stage-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stage-pill {
+  flex: 1;
+  min-width: 140px;
+  font-family: var(--font-ui);
+  text-align: left;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid color-mix(in srgb, var(--mist) 35%, transparent);
+  background: var(--paper);
+  color: var(--ink);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.stage-pill span {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--mist);
+  margin-top: 2px;
+}
+.stage-pill:hover { border-color: color-mix(in srgb, var(--calm) 50%, transparent); }
+.stage-pill:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+.stage-pill.is-active {
+  border-color: var(--calm);
+  background: color-mix(in srgb, var(--calm) 12%, var(--paper));
+}
+.stage-pill.is-active span { color: var(--calm); }
+.stage-pill[disabled] { opacity: 0.55; cursor: not-allowed; }
+
+.demo-stage-caption {
+  font-size: 13px;
+  color: var(--mist);
+  margin-bottom: 18px;
+  min-height: 18px;
+}
+
 .demo-goal-row {
   display: flex;
   flex-wrap: wrap;

@@ -82,6 +82,19 @@
       <p class="section-lede">Real sessions give you a full 20 seconds before this happens. Here, it's compressed to a few seconds so you don't have to wait.</p>
 
       <div class="demo-shell">
+        <div class="demo-stage-row" role="radiogroup" aria-label="Which session number to simulate">
+          <button class="stage-pill is-active" data-stage="new" type="button">
+            Session 1<span>brand new — silent</span>
+          </button>
+          <button class="stage-pill" data-stage="ramped" type="button">
+            Session 5<span>still earning trust</span>
+          </button>
+          <button class="stage-pill" data-stage="full" type="button">
+            Session 15+<span>full intensity</span>
+          </button>
+        </div>
+        <p class="demo-stage-caption" id="demoStageCaption">New installs get 3 fully silent sessions before the buddy ever speaks up — try one, then compare it to session 15+.</p>
+
         <div class="demo-goal-row">
           <input id="goalInput" type="text" maxlength="60" placeholder="What are you working on? e.g. &quot;finishing my essay&quot;" />
           <button class="btn btn-primary" id="startDemoBtn">Start focus session</button>
