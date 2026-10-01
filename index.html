@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Focus Buddy — the companion that watches your screen and talks you back to work</title>
-<meta name="description" content="Focus Buddy is a Mac desktop companion that watches your active window against your own stated goal — no universal blocklist — and steps in with one honest, screen-darkening intervention when you drift. Try the live demo." />
+<meta name="description" content="Focus Buddy is a Mac and Windows desktop companion that watches your active window against your own stated goal — no universal blocklist — and steps in with one honest, screen-darkening intervention when you drift. Try the live demo." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&display=swap" rel="stylesheet">
@@ -63,12 +63,12 @@
         <div class="step">
           <div class="step-num">2</div>
           <h3>It watches, quietly</h3>
-          <p>The character sits small in the corner. New users get a fully silent trust-ramp — it earns the right to speak up before it ever does.</p>
+          <p>The character sits small in the corner. Simple rules judge most windows instantly; for the unclear ones, an AI checks the page against your goal.</p>
         </div>
         <div class="step">
           <div class="step-num">3</div>
           <h3>One honest intervention</h3>
-          <p>Drift and stay drifted, and the screen darkens, video pauses, sound mutes, and a card names the exact thing pulling you away. Two honest buttons. Never a trap.</p>
+          <p>Stay drifted for 10 seconds and the screen darkens, video pauses, sound mutes, and a card names the exact thing pulling you away. Your first drift each day is free; after that, the mouse freezes a little longer every time.</p>
         </div>
       </div>
     </div>
@@ -79,21 +79,21 @@
     <div class="wrap">
       <div class="section-kicker">Try it yourself</div>
       <h2 class="section-title">This is the actual intervention — sped up so you can see the whole thing right now.</h2>
-      <p class="section-lede">Real sessions give you a full 20 seconds before this happens. Here, it's compressed to a few seconds so you don't have to wait.</p>
+      <p class="section-lede">For real, you get 10 seconds of drifting before this happens. Here the wait is cut to a few seconds; the freeze lasts its real length.</p>
 
       <div class="demo-shell">
-        <div class="demo-stage-row" role="radiogroup" aria-label="Which session number to simulate">
-          <button class="stage-pill is-active" data-stage="new" type="button">
-            Session 1<span>brand new — silent</span>
+        <div class="demo-stage-row" role="radiogroup" aria-label="Which drift of the day to simulate">
+          <button class="stage-pill is-active" data-stage="1" type="button">
+            1st drift today<span>free pass, no freeze</span>
           </button>
-          <button class="stage-pill" data-stage="ramped" type="button">
-            Session 5<span>still earning trust</span>
+          <button class="stage-pill" data-stage="2" type="button">
+            2nd drift today<span>5-second freeze</span>
           </button>
-          <button class="stage-pill" data-stage="full" type="button">
-            Session 15+<span>full intensity</span>
+          <button class="stage-pill" data-stage="3" type="button">
+            3rd drift today<span>10-second freeze</span>
           </button>
         </div>
-        <p class="demo-stage-caption" id="demoStageCaption">New installs get 3 fully silent sessions before the buddy ever speaks up — try one, then compare it to session 15+.</p>
+        <p class="demo-stage-caption" id="demoStageCaption">Every day starts with one free pass: your first drift goes straight to the card. Try it, then compare it to the 2nd or 3rd.</p>
 
         <div class="demo-goal-row">
           <input id="goalInput" type="text" maxlength="60" placeholder="What are you working on? e.g. &quot;finishing my essay&quot;" />
@@ -112,14 +112,25 @@
             <div class="demo-bubble" id="demoBubble"></div>
             <div class="demo-card" id="demoCard">
               <p class="demo-card-line" id="demoCardLine"></p>
-              <div class="demo-card-actions">
+              <div class="demo-card-actions" id="demoCardActions">
                 <button class="btn btn-card-primary" id="demoBackBtn">Back to work</button>
                 <button class="btn btn-card-secondary" id="demoGraceBtn">Yeah, I need this</button>
+              </div>
+              <div class="demo-card-reason" id="demoCardReason" hidden>
+                <p class="demo-card-reason-hint">Why are you staying?</p>
+                <input type="text" id="demoReasonInput" maxlength="140" placeholder="Type a real reason..." />
+                <div class="demo-card-actions">
+                  <button class="btn btn-card-primary" id="demoReasonConfirmBtn" disabled>Confirm</button>
+                  <button class="btn btn-card-secondary" id="demoReasonCancelBtn">Never mind</button>
+                </div>
               </div>
             </div>
             <div class="demo-creature">
               <div class="eye left"></div>
               <div class="eye right"></div>
+              <div class="cheek left"></div>
+              <div class="cheek right"></div>
+              <div class="mouth"></div>
             </div>
           </div>
         </div>
@@ -152,9 +163,9 @@
           <h3>Focus Buddy</h3>
           <ul>
             <li>Judged against the goal you stated for THIS session</li>
-            <li>Stays quiet while you're on track — earns trust before it nags</li>
+            <li>Stays quiet while you're on track; one free pass a day, then the stakes go up</li>
             <li>Names the exact thing pulling you away, out loud</li>
-            <li>Always an honest, one-click way out — never a trap</li>
+            <li>Always an honest way out: get back to work, or type why you're staying</li>
           </ul>
         </div>
       </div>
@@ -168,11 +179,14 @@
       <h2 class="section-title">Built to be honest about what it's doing, and gentle about how it does it.</h2>
       <div class="features">
         <div class="feature"><div class="dot" style="background:var(--calm)"></div><h4>Judged against your goal</h4><p>Not a universal app list — your own stated intent for this session.</p></div>
-        <div class="feature"><div class="dot" style="background:var(--amber)"></div><h4>Trust-before-nag ramp</h4><p>Brand new? It stays fully silent for your first few sessions before it ever speaks up.</p></div>
+        <div class="feature"><div class="dot" style="background:var(--amber)"></div><h4>One free pass a day</h4><p>Your first drift each day goes straight to the card. After that, the mouse freezes 5 seconds longer each time before it appears.</p></div>
         <div class="feature"><div class="dot" style="background:var(--ember)"></div><h4>One honest escalation</h4><p>No ladder of nagging notifications — a soft edge-warning, then one clear intervention.</p></div>
         <div class="feature"><div class="dot" style="background:var(--calm)"></div><h4>Pauses video, mutes sound</h4><p>The distraction actually stops — not just gets covered up by a dark screen.</p></div>
-        <div class="feature"><div class="dot" style="background:var(--amber)"></div><h4>Never a trap</h4><p>Keyboard is never blocked. Every intervention has an immediate, honest way out.</p></div>
-        <div class="feature"><div class="dot" style="background:var(--ember)"></div><h4>Privacy by design</h4><p>Window titles, URL paths, and query strings are never stored — not just kept private, never collected.</p></div>
+        <div class="feature"><div class="dot" style="background:var(--amber)"></div><h4>Never a trap</h4><p>Only the mouse ever freezes, with a visible countdown. Your keyboard and the Stop button keep working the whole time.</p></div>
+        <div class="feature"><div class="dot" style="background:var(--ember)"></div><h4>Privacy by design</h4><p>Window titles and URLs are never saved. For unclear windows, the AI sees only your goal, the app, the window title and the site name. Never the full URL, and nothing is logged.</p></div>
+        <div class="feature"><div class="dot" style="background:var(--calm)"></div><h4>Back to the exact tab</h4><p>"Back to work" returns you to the app and the browser tab you were on, in Chrome, Safari and Edge.</p></div>
+        <div class="feature"><div class="dot" style="background:var(--amber)"></div><h4>See your week</h4><p>A local dashboard shows each day and hour split into productive, neutral and distracted time.</p></div>
+        <div class="feature"><div class="dot" style="background:var(--ember)"></div><h4>Mac and Windows</h4><p>Voice, video pause, muting and tab switching all work natively on both.</p></div>
       </div>
     </div>
   </section>
@@ -193,7 +207,7 @@
 
 <footer>
   <div class="wrap">
-    <div>© Focus Buddy. A screen-only, privacy-first focus companion for Mac.</div>
+    <div>© Focus Buddy. A screen-only, privacy-first focus companion for Mac and Windows.</div>
     <div><a href="mailto:cynthia.us@gmail.com">cynthia.us@gmail.com</a></div>
   </div>
 </footer>

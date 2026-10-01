@@ -208,6 +208,26 @@ header .wrap {
   background: var(--calm);
   transition: background 300ms ease, transform 300ms ease, left 300ms ease, top 300ms ease, right 300ms ease, bottom 300ms ease;
 }
+/* Leaf sprout and two eyes, matching the app's buddy at a glance. */
+.preview-creature::before {
+  content: "";
+  position: absolute;
+  top: -5px; left: 19px;
+  width: 7px; height: 8px;
+  background: #3E9B57;
+  border-radius: 0 100% 0 100%;
+  transform: rotate(-12deg);
+  transform-origin: bottom left;
+}
+.preview-creature::after {
+  content: "";
+  position: absolute;
+  top: 14px; left: 11px;
+  width: 6px; height: 7px;
+  border-radius: 50%;
+  background: #17151C;
+  box-shadow: 12px 0 0 #17151C;
+}
 .preview-frame[data-stage="warning"] .preview-creature,
 .preview-frame[data-stage="takeover"] .preview-creature {
   right: auto; bottom: auto;
@@ -379,6 +399,10 @@ section { padding: 64px 0; }
   aspect-ratio: 16 / 9;
   border: 1px solid color-mix(in srgb, var(--mist) 22%, transparent);
 }
+/* 16:9 is too short on a phone to fit the card, reason box and buddy. */
+@media (max-width: 600px) {
+  .demo-screen { aspect-ratio: auto; min-height: 440px; }
+}
 .demo-fake-chrome {
   height: 34px;
   display: flex;
@@ -422,7 +446,10 @@ section { padding: 64px 0; }
   pointer-events: none;
   transition: opacity 320ms ease;
 }
-.demo-screen[data-stage="escalated"] .demo-wash { opacity: 1; pointer-events: auto; }
+.demo-screen[data-stage="escalated"] .demo-wash,
+.demo-screen[data-stage="frozen"] .demo-wash { opacity: 1; pointer-events: auto; }
+/* The freeze blocks the mouse, so show that the screen won't take clicks. */
+.demo-screen[data-stage="frozen"] { cursor: not-allowed; }
 
 .demo-buddy {
   position: absolute;
@@ -434,24 +461,47 @@ section { padding: 64px 0; }
   transition: right 320ms ease, bottom 320ms ease, left 320ms ease, top 320ms ease, transform 320ms ease;
 }
 .demo-screen[data-stage="drifting"] .demo-buddy,
+.demo-screen[data-stage="frozen"] .demo-buddy,
 .demo-screen[data-stage="escalated"] .demo-buddy {
   right: auto; bottom: auto;
   left: 50%; top: 50%;
   transform: translate(-50%, -50%);
 }
 
+/* Same face as the app's buddy (its styles.css), scaled from 120px to 64px.
+   The face is always dark: it sits on the creature's colored body, and
+   --ink flips to near-white in dark mode. */
 .demo-creature {
+  --face: #17151C;
   position: relative;
   width: 64px; height: 64px;
   border-radius: 50% 50% 46% 46%;
-  background: var(--calm);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-  transition: background 300ms ease, transform 200ms ease;
+  background-color: var(--calm);
+  background-image:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.38), transparent 36%),
+    radial-gradient(ellipse at 50% 115%, rgba(0, 0, 0, 0.22), transparent 62%);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 -3px 8px rgba(0, 0, 0, 0.10);
+  transition: background-color 300ms ease, transform 200ms ease;
+}
+.demo-creature::before {
+  content: "";
+  position: absolute;
+  top: -8px; left: 30px;
+  width: 11px; height: 12px;
+  background: #3E9B57;
+  border-radius: 0 100% 0 100%;
+  transform: rotate(-12deg);
+  transform-origin: bottom left;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.12);
 }
 .demo-screen[data-stage="drifting"] .demo-creature,
+.demo-screen[data-stage="frozen"] .demo-creature,
 .demo-screen[data-stage="escalated"] .demo-creature {
-  background: var(--ember);
+  background-color: var(--ember);
   transform: scale(1.9);
+  /* scale() doesn't move layout, so reserve the extra height (plus the
+     leaf) or the grown buddy covers the card above it. */
+  margin-top: 40px;
   animation: demo-shake 480ms ease infinite;
 }
 .demo-screen[data-stage="praise"] .demo-creature {
@@ -460,11 +510,51 @@ section { padding: 64px 0; }
 .demo-creature .eye {
   position: absolute; top: 22px;
   width: 11px; height: 13px;
-  background: var(--ink);
+  background: var(--face);
   border-radius: 50%;
+  transition: height 150ms ease;
 }
 .demo-creature .eye.left { left: 16px; }
 .demo-creature .eye.right { right: 16px; }
+.demo-creature .cheek {
+  position: absolute;
+  top: 37px;
+  width: 9px; height: 5px;
+  border-radius: 50%;
+  background: #FF8FB0;
+  opacity: 0.8;
+}
+.demo-creature .cheek.left  { left: 9px; }
+.demo-creature .cheek.right { right: 9px; }
+.demo-creature .mouth {
+  position: absolute;
+  top: 37px; left: 50%;
+  width: 10px; height: 5px;
+  transform: translateX(-50%);
+  border: 2px solid var(--face);
+  border-top: none;
+  border-radius: 0 0 7px 7px;
+}
+/* Calm: an occasional blink. */
+.demo-screen[data-stage="idle"] .demo-creature .eye,
+.demo-screen[data-stage="watching"] .demo-creature .eye { animation: demo-blink 5s ease-in-out infinite; }
+/* Drifting: a worried "o". */
+.demo-screen[data-stage="drifting"] .demo-creature .mouth {
+  top: 40px; width: 7px; height: 7px; border: 2px solid var(--face); border-radius: 50%;
+}
+/* Frozen / escalated: wide eyes and a shocked "O". */
+.demo-screen[data-stage="frozen"] .demo-creature .eye,
+.demo-screen[data-stage="escalated"] .demo-creature .eye { height: 17px; }
+.demo-screen[data-stage="frozen"] .demo-creature .mouth,
+.demo-screen[data-stage="escalated"] .demo-creature .mouth {
+  top: 41px; width: 9px; height: 10px; border: none; background: var(--face); border-radius: 50%;
+}
+/* Praise: closed "^ ^" eyes and a big grin. */
+.demo-screen[data-stage="praise"] .demo-creature .eye {
+  height: 7px; background: transparent; border: 2px solid var(--face); border-bottom: none; border-radius: 7px 7px 0 0;
+}
+.demo-screen[data-stage="praise"] .demo-creature .mouth { width: 14px; height: 7px; background: var(--face); }
+@keyframes demo-blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
 @keyframes demo-shake { 0%,100% { transform: scale(1.9) translateX(0); } 25% { transform: scale(1.9) translateX(-3px); } 75% { transform: scale(1.9) translateX(3px); } }
 @keyframes demo-bounce { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-10px); } }
 
@@ -492,8 +582,14 @@ section { padding: 64px 0; }
   max-width: 300px;
   text-align: center;
 }
-.demo-screen[data-stage="escalated"] .demo-card { display: flex; }
-.demo-screen[data-stage="escalated"] .demo-bubble { display: none; }
+.demo-screen[data-stage="escalated"] .demo-card,
+.demo-screen[data-stage="frozen"] .demo-card { display: flex; }
+.demo-screen[data-stage="escalated"] .demo-bubble,
+.demo-screen[data-stage="frozen"] .demo-bubble { display: none; }
+/* Nothing to click during the freeze, just the countdown. */
+.demo-screen[data-stage="frozen"] .demo-card-actions,
+.demo-screen[data-stage="frozen"] .demo-card-reason { display: none; }
+.demo-card-actions[hidden] { display: none; }
 .demo-card-line {
   color: #fff;
   font-size: 15px;
@@ -503,6 +599,23 @@ section { padding: 64px 0; }
 }
 .demo-card-actions { display: flex; gap: 8px; }
 .demo-card-actions .btn { font-size: 12.5px; padding: 9px 16px; }
+
+/* The reason box that replaces the two buttons after "Yeah, I need this". */
+.demo-card-reason { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+.demo-card-reason[hidden] { display: none; }
+.demo-card-reason-hint { color: rgba(255, 255, 255, 0.75); font-size: 12.5px; }
+.demo-card-reason input {
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+.demo-card-reason input::placeholder { color: rgba(255, 255, 255, 0.6); }
+.demo-card-reason input:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 
 .demo-controls {
   display: flex;

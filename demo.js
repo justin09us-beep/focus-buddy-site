@@ -3,9 +3,9 @@
      1) the small auto-playing loop in the hero (pure decoration, no
         input, cycles on its own forever)
      2) the big interactive demo lower on the page (a real, clickable
-        walk-through of the actual intervention state machine, timing
-        compressed from the real app's 20s drift window down to a few
-        seconds so visitors don't have to wait)
+        walk-through of the actual intervention state machine, the drift
+        wait compressed from the real app's 10s down to a few seconds so
+        visitors don't have to wait; the freeze runs at its real length)
    Neither of these touches a real screen or a real window — this is a
    self-contained simulation for the page, not the actual watcher.
    ===================================================================== */
@@ -44,34 +44,33 @@
   const status = document.getElementById("demoStatus");
   const url = document.getElementById("demoUrl");
   const bubble = document.getElementById("demoBubble");
-  const card = document.getElementById("demoCard");
   const cardLine = document.getElementById("demoCardLine");
+  const cardActions = document.getElementById("demoCardActions");
+  const cardReason = document.getElementById("demoCardReason");
+  const reasonInput = document.getElementById("demoReasonInput");
+  const reasonConfirmBtn = document.getElementById("demoReasonConfirmBtn");
+  const reasonCancelBtn = document.getElementById("demoReasonCancelBtn");
   const backBtn = document.getElementById("demoBackBtn");
   const graceBtn = document.getElementById("demoGraceBtn");
   const hint = document.getElementById("demoHint");
   const stagePills = Array.from(document.querySelectorAll(".stage-pill"));
   const stageCaption = document.getElementById("demoStageCaption");
 
-  // Timing, compressed from the real app's ~20s (or, ramped, ~40s) drift window.
+  // The drift wait is compressed from the real app's 10s; the freeze is not.
   const WATCH_MS = 2400;
   const DRIFT_MS = 2800;
   const SETTLE_MS = 2200;
-  const SILENT_HOLD_MS = 3200; // how long we sit on "nothing happened" for session 1
 
-  // Mirrors the real app's trust ramp (main.js: QUIET_SESSIONS=3,
-  // RAMP_SESSIONS=7) — three presets a visitor can compare directly.
+  // Mirrors the real app's daily escalation (daily-escalation.js +
+  // main.js's record-escalation: freezeMs = (count - 1) * 5000). The
+  // first escalation each calendar day is free; every one after that
+  // freezes the mouse 5s longer than the last.
   const STAGES = {
-    new: {
-      caption: "New installs get 3 fully silent sessions before the buddy ever speaks up — try one, then compare it to session 15+.",
-    },
-    ramped: {
-      caption: "Sessions 4–10 still get 2x as long (about 40s for real) before escalating — still finding its footing.",
-    },
-    full: {
-      caption: "From session 11 on, this is it for good: the normal ~20s fuse, every time.",
-    },
+    1: { freezeSec: 0, caption: "Every day starts with one free pass: your first drift goes straight to the card. Try it, then compare it to the 2nd or 3rd." },
+    2: { freezeSec: 5, caption: "Your 2nd drift of the day: the mouse freezes for 5 seconds before the card appears. Keyboard and Stop still work." },
+    3: { freezeSec: 10, caption: "Every drift after that adds another 5 seconds. The count resets at midnight." },
   };
-  let selectedStage = "new";
+  let selectedStage = "1";
 
   let runToken = 0; // bumped on every (re)start so stale timers no-op
 
@@ -91,64 +90,65 @@
     });
   }
 
+  function showActions() {
+    cardReason.hidden = true;
+    cardActions.hidden = false;
+  }
+
+  function unlockControls() {
+    startBtn.disabled = false;
+    goalInput.disabled = false;
+    stagePills.forEach((p) => (p.disabled = false));
+  }
+
   async function run(goal, token, stage) {
     try {
-      // Watching, quietly — identical for all three stages. The
-      // difference only shows up once you actually drift.
+      // Watching, quietly.
       setStage("watching");
+      showActions();
       url.textContent = "your-screen";
       status.textContent = `Watching your screen for: "${goal}"`;
       showBubble("");
-      hint.textContent = "Watching, quietly — stays small in the corner while you're on track.";
+      hint.textContent = "Watching, quietly. It stays small in the corner while you're on track.";
       await wait(WATCH_MS, token);
 
       // Drift onto a distraction.
       url.textContent = "youtube.com/watch?v=…";
       status.textContent = "";
-
-      if (stage === "new") {
-        // The trust ramp's whole point: a brand-new session says and
-        // shows NOTHING here, even though it saw the exact same drift.
-        setStage("watching");
-        hint.textContent = 'Drifted onto YouTube — and session #1 says nothing at all. No warning, no card. Just watching.';
-        await wait(SILENT_HOLD_MS, token);
-        await settle('(Silence was the whole point.)', token, { silent: true });
-        return;
-      }
-
-      // Ramped and full-intensity both show the same real visuals — the
-      // ramp's only difference is HOW LONG this stage lasts for real
-      // (about 40s vs. 20s), which we can't show directly at demo speed,
-      // so the hint says it instead.
       setStage("drifting");
-      hint.textContent = stage === "ramped"
-        ? "Drifted off goal — still silent, but for real this stage lasts twice as long (about 40s) while it's still earning trust."
-        : "Drifted off goal — the edges darken as a quiet early warning. Still silent.";
+      hint.textContent = "Drifted off goal. The edges darken as a quiet early warning. Still silent.";
       await wait(DRIFT_MS, token);
 
-      // Still drifted — the full intervention.
+      // Still drifted. Today's count decides whether a freeze comes first.
+      const freezeSec = STAGES[stage].freezeSec;
+      if (freezeSec > 0) {
+        setStage("frozen");
+        hint.textContent = "Drift #" + stage + " today, so the mouse freezes first. Try clicking: nothing goes through. Keyboard and Stop still work.";
+        for (let left = freezeSec; left > 0; left -= 1) {
+          cardLine.textContent = `Frozen — back in ${left}s`;
+          await wait(1000, token);
+        }
+      }
+
+      // The full intervention.
       setStage("escalated");
       cardLine.textContent = `You said you were working on "${goal}." This looks like YouTube.`;
-      hint.textContent = "Screen darkens, video pauses, sound mutes — and it names the exact distraction. Two honest ways out below.";
+      hint.textContent = freezeSec > 0
+        ? "Now the card: video paused, sound muted, the exact distraction named. Two honest ways out below."
+        : "Free pass, so no freeze. Straight to the card: video paused, sound muted, the exact distraction named.";
     } catch (e) {
       // A restart cancelled this run — nothing to clean up, the new
       // run already owns the screen.
     }
   }
 
-  async function settle(message, token, opts) {
-    const options = opts || {};
-    setStage(options.silent ? "watching" : "praise");
+  async function settle(message, token) {
+    setStage("praise");
+    showActions();
     url.textContent = "your-screen";
     showBubble(message);
-    if (options.silent) {
-      hint.textContent = 'That\'s the trust ramp — click "Restart demo" and try session 15+ to see the difference.';
-    } else {
-      hint.textContent = "Back to idle — click \"Restart demo\" to run it again.";
-    }
-    startBtn.disabled = false;
-    goalInput.disabled = false;
-    stagePills.forEach((p) => (p.disabled = false));
+    hint.textContent = 'Back to idle. Pick another drift above and click "Start focus session" to compare.';
+    unlockControls();
     try {
       await wait(SETTLE_MS, token);
       setStage("idle");
@@ -181,26 +181,43 @@
   restartBtn.addEventListener("click", () => {
     runToken += 1; // cancels any in-flight run
     setStage("idle");
+    showActions();
     showBubble("");
     status.textContent = "";
     url.textContent = "your-screen";
-    startBtn.disabled = false;
-    goalInput.disabled = false;
-    stagePills.forEach((p) => (p.disabled = false));
+    unlockControls();
     hint.textContent = 'Type a goal (or leave the default) and click "Start focus session" to begin.';
   });
 
   backBtn.addEventListener("click", () => {
-    const token = runToken;
-    startBtn.disabled = false;
-    goalInput.disabled = false;
-    settle("Nice — back on track.", token);
+    settle("Nice — back on track.", runToken);
   });
 
+  // "Yeah, I need this" doesn't confirm anything by itself: staying
+  // takes a typed reason, same as the real app.
   graceBtn.addEventListener("click", () => {
-    const token = runToken;
-    startBtn.disabled = false;
-    goalInput.disabled = false;
-    settle("Got it — I'll stay quiet for a while.", token);
+    cardActions.hidden = true;
+    cardReason.hidden = false;
+    reasonInput.value = "";
+    reasonConfirmBtn.disabled = true;
+    reasonInput.focus();
+    hint.textContent = "Staying takes a real reason. Confirm stays disabled until you type one.";
+  });
+
+  reasonInput.addEventListener("input", () => {
+    reasonConfirmBtn.disabled = reasonInput.value.trim().length === 0;
+  });
+  reasonInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !reasonConfirmBtn.disabled) reasonConfirmBtn.click();
+  });
+
+  reasonCancelBtn.addEventListener("click", () => {
+    showActions();
+    hint.textContent = "Screen darkens, video pauses, sound mutes, and it names the exact distraction. Two honest ways out below.";
+  });
+
+  reasonConfirmBtn.addEventListener("click", () => {
+    if (reasonInput.value.trim().length === 0) return;
+    settle("Okay — taking a breather. I'll check back in.", runToken);
   });
 })();
