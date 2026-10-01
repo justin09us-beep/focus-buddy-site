@@ -5,7 +5,7 @@
      2) the big interactive demo lower on the page (a real, clickable
         walk-through of the actual intervention state machine, the drift
         wait compressed from the real app's 10s down to a few seconds so
-        visitors don't have to wait; the freeze runs at its real length)
+        visitors don't have to wait)
    Neither of these touches a real screen or a real window — this is a
    self-contained simulation for the page, not the actual watcher.
    ===================================================================== */
@@ -53,24 +53,11 @@
   const backBtn = document.getElementById("demoBackBtn");
   const graceBtn = document.getElementById("demoGraceBtn");
   const hint = document.getElementById("demoHint");
-  const stagePills = Array.from(document.querySelectorAll(".stage-pill"));
-  const stageCaption = document.getElementById("demoStageCaption");
 
-  // The drift wait is compressed from the real app's 10s; the freeze is not.
+  // Timing, compressed from the real app's 10s drift window.
   const WATCH_MS = 2400;
   const DRIFT_MS = 2800;
   const SETTLE_MS = 2200;
-
-  // Mirrors the real app's daily escalation (daily-escalation.js +
-  // main.js's record-escalation: freezeMs = (count - 1) * 5000). The
-  // first escalation each calendar day is free; every one after that
-  // freezes the mouse 5s longer than the last.
-  const STAGES = {
-    1: { freezeSec: 0, caption: "Every day starts with one free pass: your first drift goes straight to the card. Try it, then compare it to the 2nd or 3rd." },
-    2: { freezeSec: 5, caption: "Your 2nd drift of the day: the mouse freezes for 5 seconds before the card appears. Keyboard and Stop still work." },
-    3: { freezeSec: 10, caption: "Every drift after that adds another 5 seconds. The count resets at midnight." },
-  };
-  let selectedStage = "1";
 
   let runToken = 0; // bumped on every (re)start so stale timers no-op
 
@@ -98,10 +85,9 @@
   function unlockControls() {
     startBtn.disabled = false;
     goalInput.disabled = false;
-    stagePills.forEach((p) => (p.disabled = false));
   }
 
-  async function run(goal, token, stage) {
+  async function run(goal, token) {
     try {
       // Watching, quietly.
       setStage("watching");
@@ -119,23 +105,10 @@
       hint.textContent = "Drifted off goal. The edges darken as a quiet early warning. Still silent.";
       await wait(DRIFT_MS, token);
 
-      // Still drifted. Today's count decides whether a freeze comes first.
-      const freezeSec = STAGES[stage].freezeSec;
-      if (freezeSec > 0) {
-        setStage("frozen");
-        hint.textContent = "Drift #" + stage + " today, so the mouse freezes first. Try clicking: nothing goes through. Keyboard and Stop still work.";
-        for (let left = freezeSec; left > 0; left -= 1) {
-          cardLine.textContent = `Frozen — back in ${left}s`;
-          await wait(1000, token);
-        }
-      }
-
-      // The full intervention.
+      // Still drifted — the full intervention.
       setStage("escalated");
       cardLine.textContent = `You said you were working on "${goal}." This looks like YouTube.`;
-      hint.textContent = freezeSec > 0
-        ? "Now the card: video paused, sound muted, the exact distraction named. Two honest ways out below."
-        : "Free pass, so no freeze. Straight to the card: video paused, sound muted, the exact distraction named.";
+      hint.textContent = "Screen darkens, video pauses, sound mutes, and it names the exact distraction. Two honest ways out below.";
     } catch (e) {
       // A restart cancelled this run — nothing to clean up, the new
       // run already owns the screen.
@@ -147,7 +120,7 @@
     showActions();
     url.textContent = "your-screen";
     showBubble(message);
-    hint.textContent = 'Back to idle. Pick another drift above and click "Start focus session" to compare.';
+    hint.textContent = 'Back to idle. Click "Start focus session" to run it again.';
     unlockControls();
     try {
       await wait(SETTLE_MS, token);
@@ -158,15 +131,6 @@
     }
   }
 
-  function selectStage(stage) {
-    selectedStage = stage;
-    stagePills.forEach((p) => p.classList.toggle("is-active", p.dataset.stage === stage));
-    stageCaption.textContent = STAGES[stage].caption;
-  }
-  stagePills.forEach((pill) => {
-    pill.addEventListener("click", () => selectStage(pill.dataset.stage));
-  });
-
   startBtn.addEventListener("click", () => {
     const goal = goalInput.value.trim() || "finishing my essay";
     runToken += 1;
@@ -174,8 +138,7 @@
     startBtn.disabled = true;
     goalInput.disabled = true;
     restartBtn.disabled = false;
-    stagePills.forEach((p) => (p.disabled = true));
-    run(goal, token, selectedStage);
+    run(goal, token);
   });
 
   restartBtn.addEventListener("click", () => {

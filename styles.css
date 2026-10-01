@@ -327,48 +327,6 @@ section { padding: 64px 0; }
   box-shadow: var(--shadow);
   padding: 28px;
 }
-.demo-stage-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.stage-pill {
-  flex: 1;
-  min-width: 140px;
-  font-family: var(--font-ui);
-  text-align: left;
-  cursor: pointer;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1.5px solid color-mix(in srgb, var(--mist) 35%, transparent);
-  background: var(--paper);
-  color: var(--ink);
-  transition: border-color 120ms ease, background 120ms ease;
-}
-.stage-pill span {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--mist);
-  margin-top: 2px;
-}
-.stage-pill:hover { border-color: color-mix(in srgb, var(--calm) 50%, transparent); }
-.stage-pill:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
-.stage-pill.is-active {
-  border-color: var(--calm);
-  background: color-mix(in srgb, var(--calm) 12%, var(--paper));
-}
-.stage-pill.is-active span { color: var(--calm); }
-.stage-pill[disabled] { opacity: 0.55; cursor: not-allowed; }
-
-.demo-stage-caption {
-  font-size: 13px;
-  color: var(--mist);
-  margin-bottom: 18px;
-  min-height: 18px;
-}
-
 .demo-goal-row {
   display: flex;
   flex-wrap: wrap;
@@ -446,10 +404,7 @@ section { padding: 64px 0; }
   pointer-events: none;
   transition: opacity 320ms ease;
 }
-.demo-screen[data-stage="escalated"] .demo-wash,
-.demo-screen[data-stage="frozen"] .demo-wash { opacity: 1; pointer-events: auto; }
-/* The freeze blocks the mouse, so show that the screen won't take clicks. */
-.demo-screen[data-stage="frozen"] { cursor: not-allowed; }
+.demo-screen[data-stage="escalated"] .demo-wash { opacity: 1; pointer-events: auto; }
 
 .demo-buddy {
   position: absolute;
@@ -461,7 +416,6 @@ section { padding: 64px 0; }
   transition: right 320ms ease, bottom 320ms ease, left 320ms ease, top 320ms ease, transform 320ms ease;
 }
 .demo-screen[data-stage="drifting"] .demo-buddy,
-.demo-screen[data-stage="frozen"] .demo-buddy,
 .demo-screen[data-stage="escalated"] .demo-buddy {
   right: auto; bottom: auto;
   left: 50%; top: 50%;
@@ -495,7 +449,6 @@ section { padding: 64px 0; }
   box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.12);
 }
 .demo-screen[data-stage="drifting"] .demo-creature,
-.demo-screen[data-stage="frozen"] .demo-creature,
 .demo-screen[data-stage="escalated"] .demo-creature {
   background-color: var(--ember);
   transform: scale(1.9);
@@ -542,10 +495,8 @@ section { padding: 64px 0; }
 .demo-screen[data-stage="drifting"] .demo-creature .mouth {
   top: 40px; width: 7px; height: 7px; border: 2px solid var(--face); border-radius: 50%;
 }
-/* Frozen / escalated: wide eyes and a shocked "O". */
-.demo-screen[data-stage="frozen"] .demo-creature .eye,
+/* Escalated: wide eyes and a shocked "O". */
 .demo-screen[data-stage="escalated"] .demo-creature .eye { height: 17px; }
-.demo-screen[data-stage="frozen"] .demo-creature .mouth,
 .demo-screen[data-stage="escalated"] .demo-creature .mouth {
   top: 41px; width: 9px; height: 10px; border: none; background: var(--face); border-radius: 50%;
 }
@@ -582,13 +533,8 @@ section { padding: 64px 0; }
   max-width: 300px;
   text-align: center;
 }
-.demo-screen[data-stage="escalated"] .demo-card,
-.demo-screen[data-stage="frozen"] .demo-card { display: flex; }
-.demo-screen[data-stage="escalated"] .demo-bubble,
-.demo-screen[data-stage="frozen"] .demo-bubble { display: none; }
-/* Nothing to click during the freeze, just the countdown. */
-.demo-screen[data-stage="frozen"] .demo-card-actions,
-.demo-screen[data-stage="frozen"] .demo-card-reason { display: none; }
+.demo-screen[data-stage="escalated"] .demo-card { display: flex; }
+.demo-screen[data-stage="escalated"] .demo-bubble { display: none; }
 .demo-card-actions[hidden] { display: none; }
 .demo-card-line {
   color: #fff;
