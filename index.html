@@ -185,13 +185,14 @@
         <h2>Download the Focus Buddy beta.</h2>
         <p>Free while it's in beta. No account, no signup. Tell us what breaks and we'll fix it.</p>
 
-        <!-- demo.js's downloadPicker() reorders these so the visitor's own
-             OS comes first and is the solid button. Without JS, both show. -->
+        <!-- demo.js's downloadPicker() points each button at the matching file
+             in the latest GitHub Release of this repo, and puts the visitor's
+             own OS first. Without JS, both open the latest release page. -->
         <div class="download-row" id="downloadRow">
-          <a class="btn btn-primary download-btn" data-os="mac" href="downloads/mac/Focus-Buddy.dmg" download>
+          <a class="btn btn-primary download-btn" data-os="mac" href="https://github.com/justin09us-beep/focus-buddy-site/releases/latest">
             Download for Mac<span>macOS 13 Ventura or later · Apple Silicon</span>
           </a>
-          <a class="btn btn-ghost download-btn" data-os="windows" href="downloads/windows/Focus-Buddy-Setup.exe" download>
+          <a class="btn btn-ghost download-btn" data-os="windows" href="https://github.com/justin09us-beep/focus-buddy-site/releases/latest">
             Download for Windows<span>Windows 10 or 11 · 64-bit</span>
           </a>
         </div>

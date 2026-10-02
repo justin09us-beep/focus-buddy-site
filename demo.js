@@ -189,8 +189,8 @@
 /* ---------------------------------------------------------------------
    3) Download picker — puts the visitor's own OS first as the solid
       button. Phones, Linux and unknown platforms keep both as-is.
-      If a build hasn't been uploaded yet (the file 404s on the live
-      site), its button turns into "coming soon" instead of a dead link.
+      Each button downloads its installer from this repo's latest GitHub
+      Release; an OS with no installer there shows "coming soon".
    --------------------------------------------------------------------- */
 (function downloadPicker() {
   const row = document.getElementById("downloadRow");
@@ -227,21 +227,40 @@
     note.textContent = "Focus Buddy is a desktop app. Open this page on your Mac or Windows PC to install it.";
   }
 
-  // Only a real 404 means "not uploaded yet". Opened from disk (file://),
-  // fetch can't check, so the buttons are left alone.
-  if (location.protocol === "file:") return;
-  let missing = 0;
-  Object.values(buttons).forEach((btn) => {
-    fetch(btn.getAttribute("href"), { method: "HEAD" })
-      .then((res) => {
-        if (res.status !== 404) return;
-        missing += 1;
-        if (missing === 2 && os !== "mobile") note.textContent = "The first beta builds are on their way. Check back soon.";
-        btn.classList.add("is-soon");
-        btn.removeAttribute("href");
-        btn.setAttribute("aria-disabled", "true");
-        btn.firstChild.textContent = btn.dataset.os === "mac" ? "Mac version coming soon" : "Windows version coming soon";
-      })
-      .catch(() => {});
-  });
+  // Point each button at its installer in this repo's latest GitHub
+  // Release: the first .dmg for Mac, the first .exe for Windows (never a
+  // .blockmap). A release with no installer for an OS, or no release at
+  // all, shows "coming soon" for it. If the API can't be reached (offline,
+  // rate-limited), the buttons keep linking to the latest release page.
+  const LATEST_RELEASE_API = "https://api.github.com/repos/justin09us-beep/focus-buddy-site/releases/latest";
+  const PATTERNS = { mac: /\.dmg$/i, windows: /\.exe$/i };
+
+  function markSoon(btn) {
+    btn.classList.add("is-soon");
+    btn.removeAttribute("href");
+    btn.setAttribute("aria-disabled", "true");
+    btn.firstChild.textContent = btn.dataset.os === "mac" ? "Mac version coming soon" : "Windows version coming soon";
+  }
+
+  fetch(LATEST_RELEASE_API, { headers: { Accept: "application/vnd.github+json" } })
+    .then((res) => {
+      if (res.status === 404) return { assets: [] }; // no release published yet
+      if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+      return res.json();
+    })
+    .then((release) => {
+      const assets = release.assets || [];
+      let missing = 0;
+      Object.entries(buttons).forEach(([key, btn]) => {
+        const asset = assets.find((a) => PATTERNS[key].test(a.name));
+        if (asset) {
+          btn.href = asset.browser_download_url;
+        } else {
+          markSoon(btn);
+          missing += 1;
+        }
+      });
+      if (missing === 2 && os !== "mobile") note.textContent = "The first beta builds are on their way. Check back soon.";
+    })
+    .catch(() => {});
 })();
