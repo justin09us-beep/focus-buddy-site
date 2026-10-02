@@ -640,6 +640,21 @@ section { padding: 64px 0; }
 .cta-box .btn-primary { background: #fff; color: var(--calm); }
 .cta-note { margin-top: 14px; font-size: 12.5px; opacity: 0.85; }
 
+.download-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.download-btn { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.2; }
+.download-btn span { display: block; font-size: 11.5px; font-weight: 600; opacity: 0.75; margin-top: 3px; }
+.cta-box .btn-ghost { color: #fff; border-color: rgba(255, 255, 255, 0.7); }
+.download-btn.is-soon { opacity: 0.6; pointer-events: none; }
+
+.requirements { margin: 28px auto 0; max-width: 560px; text-align: left; font-size: 13.5px; }
+.requirements summary { cursor: pointer; text-align: center; font-weight: 700; opacity: 0.92; }
+.requirements summary:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; border-radius: 6px; }
+.requirements-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px; }
+@media (max-width: 560px) { .requirements-grid { grid-template-columns: 1fr; } }
+.requirements h3 { font-family: var(--font-display); font-size: 15px; margin-bottom: 6px; }
+.requirements ul { padding-left: 18px; display: grid; gap: 4px; opacity: 0.92; line-height: 1.45; }
+.requirements-foot { margin: 14px 0 0 !important; font-size: 12.5px !important; opacity: 0.85; }
+
 footer {
   border-top: 1px solid color-mix(in srgb, var(--mist) 18%, transparent);
   padding: 28px 0;

@@ -1,5 +1,6 @@
 /* =====================================================================
-   demo.js — two things on this page:
+   demo.js — three things on this page (the third, the download
+   picker, is at the bottom):
      1) the small auto-playing loop in the hero (pure decoration, no
         input, cycles on its own forever)
      2) the big interactive demo lower on the page (a real, clickable
@@ -182,5 +183,65 @@
   reasonConfirmBtn.addEventListener("click", () => {
     if (reasonInput.value.trim().length === 0) return;
     settle("Okay — taking a breather. I'll check back in.", runToken);
+  });
+})();
+
+/* ---------------------------------------------------------------------
+   3) Download picker — puts the visitor's own OS first as the solid
+      button. Phones, Linux and unknown platforms keep both as-is.
+      If a build hasn't been uploaded yet (the file 404s on the live
+      site), its button turns into "coming soon" instead of a dead link.
+   --------------------------------------------------------------------- */
+(function downloadPicker() {
+  const row = document.getElementById("downloadRow");
+  const note = document.getElementById("downloadNote");
+  if (!row) return;
+  const buttons = {
+    mac: row.querySelector('[data-os="mac"]'),
+    windows: row.querySelector('[data-os="windows"]'),
+  };
+
+  function detectOS() {
+    const uaPlatform = (navigator.userAgentData && navigator.userAgentData.platform) || "";
+    const ua = navigator.userAgent || "";
+    const platform = navigator.platform || "";
+    if (/android|iphone|ipad|ipod/i.test(ua) || (navigator.userAgentData && navigator.userAgentData.mobile)) return "mobile";
+    // iPadOS reports itself as a Mac; touch support gives it away.
+    if (/mac/i.test(uaPlatform + platform + ua) && navigator.maxTouchPoints > 1) return "mobile";
+    if (/mac/i.test(uaPlatform + platform + ua)) return "mac";
+    if (/win/i.test(uaPlatform + platform + ua)) return "windows";
+    return "other";
+  }
+
+  const os = detectOS();
+  if (os === "mac" || os === "windows") {
+    const mine = buttons[os];
+    const other = buttons[os === "mac" ? "windows" : "mac"];
+    mine.classList.replace("btn-ghost", "btn-primary");
+    other.classList.replace("btn-primary", "btn-ghost");
+    row.prepend(mine);
+    note.textContent = os === "mac"
+      ? "Looks like you're on a Mac. Need the Windows version? It's right there too."
+      : "Looks like you're on Windows. Need the Mac version? It's right there too.";
+  } else if (os === "mobile") {
+    note.textContent = "Focus Buddy is a desktop app. Open this page on your Mac or Windows PC to install it.";
+  }
+
+  // Only a real 404 means "not uploaded yet". Opened from disk (file://),
+  // fetch can't check, so the buttons are left alone.
+  if (location.protocol === "file:") return;
+  let missing = 0;
+  Object.values(buttons).forEach((btn) => {
+    fetch(btn.getAttribute("href"), { method: "HEAD" })
+      .then((res) => {
+        if (res.status !== 404) return;
+        missing += 1;
+        if (missing === 2 && os !== "mobile") note.textContent = "The first beta builds are on their way. Check back soon.";
+        btn.classList.add("is-soon");
+        btn.removeAttribute("href");
+        btn.setAttribute("aria-disabled", "true");
+        btn.firstChild.textContent = btn.dataset.os === "mac" ? "Mac version coming soon" : "Windows version coming soon";
+      })
+      .catch(() => {});
   });
 })();

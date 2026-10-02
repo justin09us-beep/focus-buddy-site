@@ -33,7 +33,7 @@
       </p>
       <div class="hero-ctas">
         <a class="btn btn-primary" href="#demo">Try the live demo</a>
-        <a class="btn btn-ghost" href="#early-access">Get early access</a>
+        <a class="btn btn-ghost" href="#download">Download beta version</a>
       </div>
 
       <div class="preview-frame" id="previewFrame" data-stage="calm" aria-hidden="true">
@@ -179,13 +179,47 @@
   </section>
 
   <!-- ================= FINAL CTA ================= -->
-  <section class="cta-section" id="early-access">
+  <section class="cta-section" id="download">
     <div class="wrap">
       <div class="cta-box">
-        <h2>Focus Buddy is currently in early, hands-on development.</h2>
-        <p>We're letting a small group try it before a public release. Tell us you want in and we'll follow up directly.</p>
-        <a class="btn btn-primary" href="mailto:cynthia.us@gmail.com?subject=Focus%20Buddy%20early%20access">Get early access</a>
-        <div class="cta-note">No account, no signup form yet — just an email, from a real person.</div>
+        <h2>Download the Focus Buddy beta.</h2>
+        <p>Free while it's in beta. No account, no signup. Tell us what breaks and we'll fix it.</p>
+
+        <!-- demo.js's downloadPicker() reorders these so the visitor's own
+             OS comes first and is the solid button. Without JS, both show. -->
+        <div class="download-row" id="downloadRow">
+          <a class="btn btn-primary download-btn" data-os="mac" href="downloads/mac/Focus-Buddy.dmg" download>
+            Download for Mac<span>macOS 13 Ventura or later · Apple Silicon</span>
+          </a>
+          <a class="btn btn-ghost download-btn" data-os="windows" href="downloads/windows/Focus-Buddy-Setup.exe" download>
+            Download for Windows<span>Windows 10 or 11 · 64-bit</span>
+          </a>
+        </div>
+        <div class="cta-note" id="downloadNote">A desktop app for Mac and Windows.</div>
+
+        <details class="requirements">
+          <summary>System requirements &amp; first launch</summary>
+          <div class="requirements-grid">
+            <div>
+              <h3>Mac</h3>
+              <ul>
+                <li>macOS 13 Ventura or later</li>
+                <li>Apple Silicon (M1 or newer)</li>
+                <li>Screen Recording and Accessibility permission, asked on first launch</li>
+                <li>Beta builds aren't signed yet: if macOS blocks it, open System Settings → Privacy &amp; Security and click <em>Open Anyway</em></li>
+              </ul>
+            </div>
+            <div>
+              <h3>Windows</h3>
+              <ul>
+                <li>Windows 10 or 11, 64-bit</li>
+                <li>No extra permissions needed</li>
+                <li>Beta builds aren't signed yet: if SmartScreen warns you, click <em>More info</em> → <em>Run anyway</em></li>
+              </ul>
+            </div>
+          </div>
+          <p class="requirements-foot">Both: an internet connection for AI judgment of unclear windows. Without one, it falls back to its built-in rules.</p>
+        </details>
       </div>
     </div>
   </section>
