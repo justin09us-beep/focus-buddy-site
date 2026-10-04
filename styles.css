@@ -254,6 +254,11 @@ header .wrap {
   opacity: 1;
   transform: translate(-50%, 0);
 }
+/* On a phone the 16:8.5 frame is too short for the two-line card. */
+@media (max-width: 600px) {
+  .preview-frame { aspect-ratio: 1 / 1; }
+  .preview-card { top: 60%; }
+}
 .preview-caption {
   position: absolute; left: 14px; bottom: 12px;
   font-size: 12px;

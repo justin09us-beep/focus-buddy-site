@@ -61,6 +61,7 @@
   const SETTLE_MS = 2200;
 
   let runToken = 0; // bumped on every (re)start so stale timers no-op
+  let currentGoal = "finishing my essay"; // for the praise line, same as the app's
 
   function showBubble(text) {
     if (!text) { bubble.classList.remove("show"); return; }
@@ -108,8 +109,8 @@
 
       // Still drifted — the full intervention.
       setStage("escalated");
-      cardLine.textContent = `You said you were working on "${goal}." This looks like YouTube.`;
-      hint.textContent = "Screen darkens, video pauses, sound mutes, and it names the exact distraction. Two honest ways out below.";
+      cardLine.textContent = `Caught you on YouTube (“Cats vs. cucumbers”). You said '${goal}' mattered — still feeling that?`;
+      hint.textContent = "Screen darkens, sound mutes, and it names the exact distraction out loud. Two honest ways out below.";
     } catch (e) {
       // A restart cancelled this run — nothing to clean up, the new
       // run already owns the screen.
@@ -134,6 +135,7 @@
 
   startBtn.addEventListener("click", () => {
     const goal = goalInput.value.trim() || "finishing my essay";
+    currentGoal = goal;
     runToken += 1;
     const token = runToken;
     startBtn.disabled = true;
@@ -154,7 +156,7 @@
   });
 
   backBtn.addEventListener("click", () => {
-    settle("Nice — back on track.", runToken);
+    settle(`That's it. Back on ${currentGoal}. Nice work.`, runToken);
   });
 
   // "Yeah, I need this" doesn't confirm anything by itself: staying
@@ -177,7 +179,7 @@
 
   reasonCancelBtn.addEventListener("click", () => {
     showActions();
-    hint.textContent = "Screen darkens, video pauses, sound mutes, and it names the exact distraction. Two honest ways out below.";
+    hint.textContent = "Screen darkens, sound mutes, and it names the exact distraction out loud. Two honest ways out below.";
   });
 
   reasonConfirmBtn.addEventListener("click", () => {
