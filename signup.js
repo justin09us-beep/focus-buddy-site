@@ -1,10 +1,9 @@
 /* =====================================================================
    signup.js — the "Get the beta" email form.
-   The form posts straight to Kit (see its action URL in index.html),
-   which stores the address and sends the download email. It's submitted
-   into a hidden iframe so the visitor stays on this page; Kit's reply
-   isn't readable from here (it's another site), so a finished load of
-   that iframe is taken as "sent".
+   Sends the address to Kit (the form's action URL in index.html), which
+   stores it and emails the download link. Kit allows cross-site requests
+   and answers in JSON — { status: "failed", errors: { messages: [...] } }
+   on a problem — so the visitor sees Kit's real result, not a guess.
    ===================================================================== */
 
 (function signupForm() {
@@ -13,46 +12,46 @@
   const input = document.getElementById("signupEmail");
   const button = document.getElementById("signupBtn");
   const status = document.getElementById("signupStatus");
-  const sink = document.querySelector('iframe[name="signupSink"]');
 
   // Same shape browsers use for type="email": something@something.tld
   const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const SENT_FALLBACK_MS = 6000; // if the iframe never reports back
 
   function show(message, kind) {
     status.textContent = message;
     status.dataset.kind = kind || "";
   }
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
     const email = input.value.trim();
     if (!EMAIL.test(email)) {
-      event.preventDefault();
       show("Please enter a valid email address.", "error");
       input.focus();
       return;
     }
-    // Not connected to a Kit form yet — don't pretend it worked.
-    if (form.action.includes("KIT_FORM_ID")) {
-      event.preventDefault();
-      show("Sign-ups aren't open quite yet. Please check back soon.", "error");
-      return;
-    }
 
-    input.value = email;
     button.disabled = true;
     show("Sending…");
-
-    let done = false;
-    function sent() {
-      if (done) return;
-      done = true;
+    try {
+      const res = await fetch(form.action, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new URLSearchParams({ email_address: email }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.status === "failed") {
+        const messages = (data.errors && data.errors.messages) || [];
+        throw new Error(messages[0] || `Kit ${res.status}`);
+      }
       form.hidden = true;
       show(`Almost there: check ${email} and confirm your address. Your download link arrives right after.`, "ok");
+    } catch (error) {
+      const known = /email address is invalid/i.test(error.message);
+      show(known
+        ? "That email address doesn't look right. Please check it."
+        : "Something went wrong sending that. Please try again in a moment.", "error");
+      button.disabled = false;
     }
-    sink.addEventListener("load", sent, { once: true });
-    setTimeout(sent, SENT_FALLBACK_MS);
-    // No preventDefault: the browser posts the form into the iframe.
   });
 
   input.addEventListener("input", () => {

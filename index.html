@@ -186,15 +186,14 @@
         <h2>Get the Focus Buddy beta.</h2>
         <p>Free while it's in beta. Leave your email and we'll send you the download link for Mac or Windows.</p>
 
-        <!-- Posts straight to Kit, which stores the address and emails the
-             download link (to download.html). Submitted into the hidden
-             iframe so the page doesn't navigate away; see signup.js. -->
-        <form class="signup-form" id="signupForm" action="https://app.kit.com/forms/KIT_FORM_ID/subscriptions" method="post" target="signupSink" novalidate>
+        <!-- Kit form "Focus Buddy beta": stores the address and emails the
+             download link (to download.html). signup.js sends it with fetch
+             and shows Kit's answer; without JS it's a plain form post. -->
+        <form class="signup-form" id="signupForm" action="https://app.kit.com/forms/9999013/subscriptions" method="post" novalidate>
           <label class="visually-hidden" for="signupEmail">Email address</label>
           <input type="email" id="signupEmail" name="email_address" placeholder="you@example.com" autocomplete="email" required />
           <button class="btn btn-primary" type="submit" id="signupBtn">Email me the link</button>
         </form>
-        <iframe name="signupSink" class="visually-hidden" title="Sign-up submission" tabindex="-1" aria-hidden="true"></iframe>
         <p class="signup-status" id="signupStatus" role="status" aria-live="polite"></p>
         <div class="cta-note">We'll only email you about Focus Buddy. Unsubscribe anytime.</div>
         <div class="cta-note">Questions first? <a href="mailto:justin09.us@gmail.com?subject=Focus%20Buddy%20beta">Email us</a>.</div>
