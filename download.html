@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Download Focus Buddy</title>
+<meta name="description" content="Download the Focus Buddy beta for Mac or Windows." />
+<!-- Reached from the sign-up email; kept out of search results. -->
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cellipse cx='50' cy='52' rx='46' ry='44' fill='%232FB784'/%3E%3Ccircle cx='34' cy='46' r='8' fill='%2317151C'/%3E%3Ccircle cx='66' cy='46' r='8' fill='%2317151C'/%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="./"><span class="brand-dot"></span> Focus Buddy</a>
+    <a class="btn btn-ghost" href="./#demo">Try the live demo</a>
+  </div>
+</header>
+
+<main>
+  <section class="cta-section" id="download">
+    <div class="wrap">
+      <div class="cta-box">
+        <h2>Download the Focus Buddy beta.</h2>
+        <p>Thanks for signing up. Pick your computer below. Tell us what breaks and we'll fix it.</p>
+
+        <!-- download.js points each button at the matching file in the
+             latest GitHub Release of this repo, and puts the visitor's own
+             OS first. Without JS, both open the latest release page. -->
+        <div class="download-row" id="downloadRow">
+          <a class="btn btn-primary download-btn" data-os="mac" href="https://github.com/justin09us-beep/focus-buddy-site/releases/latest">
+            Download for Mac<span>macOS 13 Ventura or later · Apple Silicon</span>
+          </a>
+          <a class="btn btn-ghost download-btn" data-os="windows" href="https://github.com/justin09us-beep/focus-buddy-site/releases/latest">
+            Download for Windows<span>Windows 10 or 11 · 64-bit</span>
+          </a>
+        </div>
+        <div class="cta-note" id="downloadNote">A desktop app for Mac and Windows.</div>
+        <div class="cta-note">Stuck? <a href="mailto:justin09.us@gmail.com?subject=Focus%20Buddy%20beta">Email us</a>.</div>
+
+        <details class="requirements" open>
+          <summary>System requirements &amp; first launch</summary>
+          <div class="requirements-grid">
+            <div>
+              <h3>Mac</h3>
+              <ul>
+                <li>macOS 13 Ventura or later</li>
+                <li>To install, open the .dmg and drag Focus Buddy to Applications</li>
+                <li>Apple Silicon (M1 or newer)</li>
+                <li>No Screen Recording or Accessibility permission needed</li>
+                <li>Asks once per browser (Chrome, Safari, Edge, Brave) to read the current tab, after explaining why</li>
+                <li>Beta builds aren't signed yet: if macOS blocks it, open System Settings → Privacy &amp; Security and click <em>Open Anyway</em></li>
+              </ul>
+            </div>
+            <div>
+              <h3>Windows</h3>
+              <ul>
+                <li>Windows 10 or 11, 64-bit</li>
+                <li>No extra permissions needed</li>
+                <li>Beta builds aren't signed yet: if SmartScreen warns you, click <em>More info</em> → <em>Run anyway</em></li>
+              </ul>
+            </div>
+          </div>
+          <p class="requirements-foot">Both: an internet connection for AI judgment of unclear windows. Without one, it falls back to its built-in rules.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>© Focus Buddy. A screen-only, privacy-first focus companion for Mac and Windows.</div>
+    <div><a href="mailto:justin09.us@gmail.com">justin09.us@gmail.com</a></div>
+  </div>
+</footer>
+
+<script src="download.js"></script>
+</body>
+</html>
