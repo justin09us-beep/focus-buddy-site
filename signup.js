@@ -44,7 +44,7 @@
         throw new Error(messages[0] || `Kit ${res.status}`);
       }
       form.hidden = true;
-      show(`Almost there: check ${email} and confirm your address. Your download link arrives right after.`, "ok");
+      show(`Almost there: check ${email} and confirm your address. Your download link arrives right after. Don't see it in a few minutes? Check your spam or junk folder.`, "ok");
     } catch (error) {
       const known = /email address is invalid/i.test(error.message);
       show(known
